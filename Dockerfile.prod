@@ -1,0 +1,19 @@
+FROM golang:latest AS builder
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN go mod tidy
+RUN go build -o main
+
+# Otimizando imagem - Multistagin build
+FROM alpine
+
+WORKDIR /var/www
+
+RUN rm -rf /var/www/html
+
+COPY --from=builder /usr/src/app/main .
+
+CMD [ "./main" ]
